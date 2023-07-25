@@ -24,13 +24,28 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+     client.connect();
 
    const collaCollection=client.db('admisson').collection('collage');
+   const userCollection=client.db('admisson').collection('users');
+
    app.get('/collage',async(req,res)=>{
      const result=await collaCollection.find().toArray();
      res.send(result)
    })
+
+  //  user create 
+
+  app.post('/users',async(req,res)=>{
+    const user=req.body;
+    const query={email:user.email}
+    const insertUser=await userCollection.findOne(query);
+    if(insertUser){
+        return res.send({massege:'already inserted'})
+    }
+    const result=await userCollection.insertOne(user);
+    res.send(result)
+})
 
    app.get('/collage/:id', async (req, res) => {
     const id = req.params.id;
